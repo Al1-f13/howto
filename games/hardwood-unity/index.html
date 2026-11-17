@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Hardwood</title>
+<link rel="icon" href="TemplateData/favicon.ico">
+<style>
+  :root { --bg:#07090f; --text:#f1f4ff; --muted:#98a3c0; --accent:#ffb938; color-scheme:dark; }
+  html, body { height:100%; margin:0; background:var(--bg); color:var(--text);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; overflow:hidden; }
+  body { display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(900px 500px at 50% 0%, rgba(255,140,60,.12), transparent 65%), var(--bg); }
+  #unity-canvas { display:block; width:min(1100px, 88vw, calc((100vh - 120px) * 16 / 9)); aspect-ratio:16/9; height:auto;
+    background:#000; outline:none; border-radius:14px; border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 30px 70px -20px rgba(0,0,0,.8); }
+  #loader { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    background:radial-gradient(700px 400px at 50% 30%, rgba(255,140,60,.16), transparent 70%), var(--bg); }
+  #loader h1 { margin:0; font-size:clamp(32px,6vw,56px); font-weight:800; letter-spacing:-.03em; }
+  #loader p { margin:0; color:var(--muted); font-size:14px; }
+  .bar { width:min(320px,80vw); height:8px; border-radius:99px; background:rgba(255,255,255,.1); overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#ffcf5c,#ff7a45); border-radius:99px; transition:width .2s; }
+  .ui { position:fixed; top:12px; display:flex; gap:8px; z-index:5; }
+  .ui.left { left:12px; } .ui.right { right:12px; }
+  .ui a, .ui button { font:600 13px/1 inherit; font-family:inherit; color:var(--text); text-decoration:none; cursor:pointer;
+    background:rgba(14,18,30,.65); border:1px solid rgba(255,255,255,.12); border-radius:99px; padding:8px 14px;
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); opacity:.75; transition:opacity .2s; }
+  .ui a:hover, .ui button:hover { opacity:1; }
+  #err { color:#ff8a8a; max-width:60ch; text-align:center; padding:0 16px; }
+</style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div class="ui left"><a href="../../">← Arcade</a><button id="fs" type="button">Fullscreen</button></div>
+  <div id="loader">
+    <h1>Hardwood</h1>
+    <div class="bar"><i id="progress"></i></div>
+    <p id="status">Loading… (about 80 MB the first time)</p>
+  </div>
+<script>
+  const canvas = document.getElementById("unity-canvas");
+  const config = {
+    arguments: [],
+    dataUrl: "Build/WebGL.data",
+    frameworkUrl: "Build/WebGL.framework.js",
+    codeUrl: "Build/WebGL.wasm",
+    streamingAssetsUrl: "StreamingAssets",
+    companyName: "DefaultCompany",
+    productName: "Hardwood",
+    productVersion: "0.1.0",
+    showBanner: (msg, type) => { if (type === "error") showError(msg); else console.warn(msg); },
+  };
+  function showError(msg) {
+    document.getElementById("loader").style.display = "flex";
+    const s = document.getElementById("status");
+    s.id = "err"; s.textContent = msg;
+  }
+  const script = document.createElement("script");
+  script.src = "Build/WebGL.loader.js";
+  script.onload = () => {
+    createUnityInstance(canvas, config, p => {
+      document.getElementById("progress").style.width = (100 * p) + "%";
+    }).then(instance => {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("fs").onclick = () => instance.SetFullscreen(1);
+      canvas.focus();
+    }).catch(showError);
+  };
+  script.onerror = () => showError("Couldn't load the game files.");
+  document.body.appendChild(script);
+  canvas.addEventListener("pointerdown", () => canvas.focus());
+</script>
+</body>
+</html>

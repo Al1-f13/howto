@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>The Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0b10;
+      --surface: #14161f;
+      --surface-2: #1b1e29;
+      --line: rgba(255,255,255,.08);
+      --text: #f4f4f7;
+      --muted: #9b9fb2;
+      --accent: #ffb938;
+      --display: "Sora", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(255,140,60,.14), transparent 60%),
+        radial-gradient(800px 500px at 90% 0%, rgba(90,110,255,.16), transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--body);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    header { max-width: 1120px; margin: 0 auto; padding: 72px 24px 40px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent);
+    }
+    .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+    h1 {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(44px, 8vw, 84px);
+      line-height: 1.02;
+      letter-spacing: -.035em;
+      margin: 14px 0 0;
+      background: linear-gradient(180deg, #fff 30%, #b8bccd);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    h1 span { background: linear-gradient(100deg, #ffcf5c, #ff7a45 60%, #ff4f7a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    header p { color: var(--muted); margin: 18px 0 0; max-width: 54ch; font-size: 17px; }
+
+    main {
+      max-width: 1120px; margin: 0 auto; padding: 0 24px 72px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;
+    }
+    .game {
+      position: relative;
+      display: flex; flex-direction: column;
+      background: linear-gradient(180deg, var(--surface-2), var(--surface));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      color: inherit; text-decoration: none;
+      box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 12px 32px -12px rgba(0,0,0,.6);
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s, border-color .35s;
+    }
+    .game:hover, .game:focus-visible {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,.2);
+      box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 28px 50px -16px rgba(0,0,0,.75), 0 0 0 1px var(--glow, rgba(255,255,255,.1)), 0 18px 60px -20px var(--glow, transparent);
+    }
+    .game:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    .game.hardwood { --glow: rgba(255,150,60,.55); }
+    .game.rooftop  { --glow: rgba(240,90,130,.55); }
+    .game.soccer   { --glow: rgba(60,200,110,.5); }
+    .game.hwunity  { --glow: rgba(255,200,80,.55); }
+
+    .art { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #0d0f16; }
+    .art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+    .game:hover .art svg, .game:focus-visible .art svg { transform: scale(1.06); }
+    .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(10,11,16,.55)); pointer-events: none; }
+    .ball-bob { animation: bob 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .twinkle { animation: tw 3s ease-in-out infinite; }
+    @keyframes tw { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+
+    .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+    .body h2 { margin: 0; font-family: var(--display); font-size: 21px; font-weight: 700; letter-spacing: -.015em; }
+    .body p { margin: 0; color: var(--muted); font-size: 14.5px; flex: 1; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag { font-size: 12px; font-weight: 500; padding: 4px 10px; background: rgba(255,255,255,.06); border-radius: 99px; color: #c6c9d8; }
+    .tag.wip { background: rgba(255,185,56,.12); color: var(--accent); }
+    .play {
+      display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
+      margin-top: 4px; font-weight: 600; font-size: 14px; color: #12141b;
+      background: #fff; padding: 9px 16px; border-radius: 99px;
+      transition: gap .25s, background .25s;
+    }
+    .play svg { width: 16px; height: 16px; transition: transform .25s; }
+    .game:hover .play, .game:focus-visible .play { background: var(--accent); }
+    .game:hover .play svg, .game:focus-visible .play svg { transform: translateX(3px); }
+    footer { text-align: center; color: var(--muted); font-size: 13px; padding: 0 24px 48px; }
+
+    @media (max-width: 520px) {
+      header { padding: 48px 20px 28px; }
+      main { padding: 0 20px 56px; gap: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Browser games</div>
+    <h1>The <span>Arcade</span></h1>
+    <p>Games I've made. Pick one and play. Click inside the game once so it can hear your keyboard.</p>
+  </header>
+
+  <main>
+    <a class="game hardwood" href="games/hardwood/" aria-label="Play Hardwood 3v3">
+      <div class="art" aria-hidden="true">
+        <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="hw-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#171a2e"/><stop offset="1" stop-color="#2a1f3a"/></linearGradient>
+            <linearGradient id="hw-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9a65a"/><stop offset="1" stop-color="#a8622a"/></linearGradient>
+            <radialGradient id="hw-spot" cx=".5" cy=".3" r=".7"><stop offset="0" stop-color="#fff2cf" stop-opacity=".55"/><stop offset="1" stop-color="#fff2cf" stop-opacity="0"/></radialGradient>
+            <radialGradient id="hw-ball" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffa45a"/><stop offset=".6" stop-color="#e2641d"/><stop offset="1" stop-color="#9c3d0c"/></radialGradient>
+            <linearGradient id="hw-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#9fc4ff" stop-opacity=".12"/></linearGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#hw-sky)"/>
+          <g fill="#ffd9a0">
+            <circle class="twinkle" cx="90" cy="60" r="2"/><circle class="twinkle" style="animation-delay:.8s" cx="180" cy="38" r="1.6"/>
+            <circle class="twinkle" style="animation-delay:1.6s" cx="470" cy="46" r="2"/><circle class="twinkle" style="animation-delay:2.2s" cx="560" cy="86" r="1.6"/>
+          </g>
+          <path d="M0 215 L640 215 L640 360 L0 360 Z" fill="url(#hw-floor)"/>
+          <path d="M0 215 L640 215" stroke="#fff" stroke-opacity=".25" stroke-width="2"/>
+          <ellipse cx="320" cy="300" rx="260" ry="46" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="3"/>
+          <path d="M200 360 L240 215 M440 360 L400 215" stroke="#fff" stroke-opacity=".5" stroke-width="3" fill="none"/>
+          <rect width="640" height="360" fill="url(#hw-spot)"/>
+          <rect x="470" y="48" width="12" height="170" rx="6" fill="#3b4258"/>
+          <rect x="400" y="52" width="92" height="64" rx="6" fill="url(#hw-glass)" stroke="#fff" stroke-opacity=".7" stroke-width="2.5"/>
+          <rect x="426" y="80" width="40" height="30" rx="2" fill="none" stroke="#ff6a3a" stroke-opacity=".9" stroke-width="2.5"/>
+          <ellipse cx="400" cy="112" rx="26" ry="6" fill="none" stroke="#ff6a3a" stroke-width="5"/>
+          <g stroke="#fff" stroke-opacity=".85" stroke-width="1.5" fill="none" stroke-linecap="round">
+            <path d="M374 114 L383 158 M384 116 L390 158 M396 118 L398 158 M408 118 L406 158 M419 116 L414 158 M427 114 L420 158"/>
+            <path d="M377 128 Q400 136 424 128 M380 142 Q400 149 421 142"/>
+          </g>
+          <ellipse cx="320" cy="322" rx="38" ry="8" fill="#000" opacity=".28"/>
+          <g class="ball-bob">
+            <circle cx="320" cy="268" r="38" fill="url(#hw-ball)"/>
+            <g stroke="#3b1706" stroke-opacity=".75" stroke-width="2.4" fill="none" stroke-linecap="round">
+              <path d="M282 268 H358"/><path d="M320 230 V306"/>
+              <path d="M292 241 Q316 268 292 295"/><path d="M348 241 Q324 268 348 295"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h2>Hardwood 3v3 <small style="font-weight:500;color:var(--muted);font-size:14px">(classic)</small></h2>
+        <p>3D three-on-three basketball against the CPU. Shoot, pass, tackle and quickstep your way through a three-minute game.</p>
+        <div class="tags"><span class="tag">3D</span><span class="tag">Sports</span><span class="tag">vs CPU</span><span class="tag">Original browser version</span></div>
+        <span class="play">Play <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+      </div>
+    </a>
+
+    <a class="game hwunity" href="games/hardwood-unity/" aria-label="Play Hardwood, Unity edition">
+      <div class="art" aria-hidden="true">
+        <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="hu-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1426"/><stop offset="1" stop-color="#241a14"/></linearGradient>
+            <linearGradient id="hu-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d89048"/><stop offset="1" stop-color="#7a4318"/></linearGradient>
+            <radialGradient id="hu-beam" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff6d8" stop-opacity=".5"/><stop offset="1" stop-color="#fff6d8" stop-opacity="0"/></radialGradient>
+            <radialGradient id="hu-ball" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb06a"/><stop offset=".6" stop-color="#e2641d"/><stop offset="1" stop-color="#8c360a"/></radialGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#hu-bg)"/>
+          <g fill="#fff" opacity=".07"><rect x="0" y="40" width="640" height="10"/><rect x="0" y="70" width="640" height="10"/><rect x="0" y="100" width="640" height="10"/></g>
+          <path d="M60 200 L580 200 L640 360 L0 360 Z" fill="url(#hu-floor)"/>
+          <g fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3">
+            <path d="M60 200 L580 200 L640 360 M0 360 L60 200"/>
+            <path d="M250 200 L230 290 L410 290 L390 200"/>
+            <path d="M230 290 Q320 330 410 290" />
+          </g>
+          <path d="M200 0 L440 0 L520 360 L120 360 Z" fill="url(#hu-beam)"/>
+          <rect x="314" y="70" width="12" height="130" fill="#3b4258"/>
+          <rect x="270" y="50" width="100" height="62" rx="5" fill="#ffffff22" stroke="#fff" stroke-opacity=".8" stroke-width="2.5"/>
+          <ellipse cx="320" cy="114" rx="24" ry="6" fill="none" stroke="#ff6a3a" stroke-width="5"/>
+          <path d="M140 300 Q240 60 312 108" stroke="#ffd27a" stroke-opacity=".7" stroke-width="3" stroke-dasharray="3 10" stroke-linecap="round" fill="none"/>
+          <g class="ball-bob"><circle cx="140" cy="290" r="26" fill="url(#hu-ball)"/>
+            <g stroke="#3b1706" stroke-opacity=".75" stroke-width="2" fill="none"><path d="M114 290 H166 M140 264 V316 M121 271 Q138 290 121 309 M159 271 Q142 290 159 309"/></g></g>
+        </svg>
+      </div>
+      <div class="body">
+        <h2>Hardwood <small style="font-weight:500;color:var(--muted);font-size:14px">(Unity edition)</small></h2>
+        <p>The newest version of Hardwood, rebuilt in Unity with a full 3D arena, real ball physics and new effects. Big download (about 80 MB), best on a desktop.</p>
+        <div class="tags"><span class="tag">3D</span><span class="tag">Sports</span><span class="tag">Unity</span><span class="tag wip">Latest build</span></div>
+        <span class="play">Play <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+      </div>
+    </a>
+
+    <a class="game rooftop" href="games/rooftop-rumble/" aria-label="Play Rooftop Rumble">
+      <div class="art" aria-hidden="true">
+        <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rr-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1445"/><stop offset=".55" stop-color="#8a2f6e"/><stop offset=".85" stop-color="#ff6a6a"/><stop offset="1" stop-color="#ffb06a"/></linearGradient>
+            <radialGradient id="rr-sun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff0c4"/><stop offset=".55" stop-color="#ffb06a"/><stop offset="1" stop-color="#ff6a6a" stop-opacity="0"/></radialGradient>
+            <linearGradient id="rr-b1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1b4f"/><stop offset="1" stop-color="#150f2c"/></linearGradient>
+            <linearGradient id="rr-roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2a52"/><stop offset="1" stop-color="#14101f"/></linearGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#rr-sky)"/>
+          <circle cx="320" cy="215" r="120" fill="url(#rr-sun)" opacity=".9"/>
+          <g fill="url(#rr-b1)">
+            <rect x="0" y="170" width="70" height="200"/><rect x="82" y="140" width="56" height="230"/><rect x="150" y="190" width="80" height="180"/>
+            <rect x="420" y="160" width="70" height="210"/><rect x="502" y="120" width="60" height="250"/><rect x="574" y="180" width="80" height="190"/>
+          </g>
+          <g fill="#ffd27a" opacity=".85">
+            <rect x="14" y="190" width="6" height="8" rx="1"/><rect x="34" y="214" width="6" height="8" rx="1"/><rect x="96" y="160" width="6" height="8" rx="1"/><rect x="116" y="196" width="6" height="8" rx="1"/>
+            <rect x="516" y="140" width="6" height="8" rx="1"/><rect x="536" y="176" width="6" height="8" rx="1"/><rect x="438" y="184" width="6" height="8" rx="1"/><rect x="592" y="204" width="6" height="8" rx="1"/>
+          </g>
+          <path d="M0 292 L640 292 L640 360 L0 360 Z" fill="url(#rr-roof)"/>
+          <path d="M0 292 H640" stroke="#ffb06a" stroke-opacity=".6" stroke-width="2"/>
+          <ellipse cx="320" cy="322" rx="170" ry="12" fill="#000" opacity=".3"/>
+          <g fill="#08060f">
+            <g transform="translate(236 0)">
+              <circle cx="0" cy="214" r="15"/><path d="M-16 236 Q0 226 16 236 L22 292 H4 L0 258 L-4 292 H-22 Z"/>
+              <path d="M12 240 L56 226 L60 238 L16 254 Z"/>
+            </g>
+            <g transform="translate(404 0) scale(-1 1)">
+              <circle cx="0" cy="214" r="15"/><path d="M-16 236 Q0 226 16 236 L22 292 H4 L0 258 L-4 292 H-22 Z"/>
+              <path d="M12 240 L56 226 L60 238 L16 254 Z"/>
+            </g>
+          </g>
+          <g stroke="#fff3cf" stroke-linecap="round" fill="none">
+            <path d="M306 224 L334 224 M312 214 L328 234 M328 214 L312 234" stroke-width="3"/>
+          </g>
+          <circle cx="320" cy="224" r="22" fill="none" stroke="#fff3cf" stroke-opacity=".35" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="body">
+        <h2>Rooftop Rumble</h2>
+        <p>Six fighters, five stages, best of three. Fight a friend on the same keyboard or take on the computer.</p>
+        <div class="tags"><span class="tag">Fighting</span><span class="tag">2 players</span><span class="tag">vs CPU</span></div>
+        <span class="play">Play <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+      </div>
+    </a>
+
+    <a class="game soccer" href="games/soccer/" aria-label="Play Soccer">
+      <div class="art" aria-hidden="true">
+        <svg viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sc-grass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2fa14a"/><stop offset="1" stop-color="#17702f"/></linearGradient>
+            <radialGradient id="sc-light" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#d6ffb0" stop-opacity=".35"/><stop offset="1" stop-color="#d6ffb0" stop-opacity="0"/></radialGradient>
+            <radialGradient id="sc-ball" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#dfe3ea"/><stop offset="1" stop-color="#9aa1b0"/></radialGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#sc-grass)"/>
+          <g fill="#fff" opacity=".06">
+            <rect x="0" y="0" width="80" height="360"/><rect x="160" y="0" width="80" height="360"/><rect x="320" y="0" width="80" height="360"/><rect x="480" y="0" width="80" height="360"/>
+          </g>
+          <rect width="640" height="360" fill="url(#sc-light)"/>
+          <g stroke="#fff" stroke-opacity=".8" stroke-width="3" fill="none">
+            <rect x="30" y="30" width="580" height="300" rx="4"/>
+            <path d="M320 30 V330"/><circle cx="320" cy="180" r="56"/>
+            <rect x="30" y="110" width="80" height="140"/><rect x="530" y="110" width="80" height="140"/>
+            <rect x="30" y="148" width="30" height="64"/><rect x="580" y="148" width="30" height="64"/>
+          </g>
+          <circle cx="320" cy="180" r="4" fill="#fff" fill-opacity=".85"/>
+          <path d="M70 180 Q200 70 320 180" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" fill="none"/>
+          <ellipse cx="338" cy="214" rx="26" ry="7" fill="#000" opacity=".28"/>
+          <g class="ball-bob">
+            <circle cx="338" cy="186" r="28" fill="url(#sc-ball)"/>
+            <g fill="#20232d">
+              <path d="M338 172 l10 7 -4 12 h-12 l-4 -12 z"/>
+              <path d="M318 170 l8 -2 2 8 -8 3 z M358 170 l-8 -2 -2 8 8 3 z M326 205 l5 -8 9 1 4 8 -9 4 z" opacity=".85"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="body">
+        <h2>Soccer</h2>
+        <p>A simple top-down soccer game.</p>
+        <div class="tags"><span class="tag">Sports</span><span class="tag wip">Work in progress</span></div>
+        <span class="play">Play <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+      </div>
+    </a>
+  </main>
+
+  <footer>Made by me.</footer>
+</body>
+</html>
